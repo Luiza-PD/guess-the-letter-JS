@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        .backGroundBody {
+            background-color: rgb(159, 159, 247);
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+
+        .imgGuess img {
+            width: 225px;
+        }
+
+        .btn {
+            width: 100%;
+            height: 60px;
+            background-image: linear-gradient(rgb(199, 136, 241), rgb(152, 47, 238));
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        input[type=text] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            border-radius: 10px;
+        }
+
+        .output {
+            color: white;
+        }
+
+        .playAgain {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .playAgain button {
+            background-image: linear-gradient(rgb(237, 240, 78), rgb(247, 247, 32));
+            border: none;
+            border-radius: 10px;
+            width: 30%;
+            height: 60px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="backGroundBody">
+    <h1>With which letter does it start</h1>
+    <h1 class="countQuestion">Question 01:</h1>
+
+    <div class="container">
+        <div class="imgGuess">
+            <img id="imgToGuess" src="">
+        </div>
+        <div class="input">
+            <input type="text" id="input" placeholder="Enter first letter">
+            <button class="btn play">Play</button>
+        </div>
+        <div class="output">
+            <h2 class="message">Start guessing...</h2>
+            <h2 class="score">Score: 0</h2>
+            <h2 class="highscore">High score: 0</h2>
+        </div>
+    </div>
+
+    <div class="playAgain hidden">
+        <button>Game over - Play again</button>
+    </div>
+
+
+    <script>
+        const animals = [
+            { img: "png_kitten.png", word: "cat" },
+            { img: "png_bird.png", word: "bird" },
+            { img: "png_snake.png", word: "snake" }
+        ];
+
+        let counter = 0;
+        let score = 0;
+        let highScore = 0;
+        let shuffledOrder = [];
+        let currentAnimalIndex = 0;
+
+        const imgElement = document.getElementById("imgToGuess");
+        const messageElement = document.querySelector(".message");
+        const scoreElement = document.querySelector(".score");
+        const highScoreElement = document.querySelector(".highscore");
+        const questionElement = document.querySelector(".countQuestion");
+        const inputElement = document.getElementById("input");
+        const btnPlayAgain = document.querySelector(".playAgain button");
+
+        function createShuffledOrder() {
+            const indices = [0, 1, 2];
+            for (let i = indices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [indices[i], indices[j]] = [indices[j], indices[i]];
+            }
+            return indices;
+        }
+
+
+        function displayAnimal(roundNumber) {
+            currentAnimalIndex = shuffledOrder[roundNumber];
+            imgElement.src = animals[currentAnimalIndex].img;
+            questionElement.textContent = "Question number " + (roundNumber + 1);
+        }
+
+
+        function reset() {
+            counter = 0;
+            score = 0;
+
+
+            shuffledOrder = createShuffledOrder();
+
+
+            displayAnimal(0);
+
+
+            scoreElement.textContent = "Score: 0";
+            messageElement.textContent = "Start guessing...";
+            inputElement.value = "";
+            document.querySelector(".playAgain").classList.add("hidden");
+        }
+
+        function play() {
+            const word = animals[currentAnimalIndex].word;
+            const letter = inputElement.value.trim().toLowerCase();
+
+            if (!letter) {
+                messageElement.textContent = "No Letter";
+                score -= 2;
+            } else if (letter === word[0]) {
+                messageElement.textContent = "Correct answer, congrats!";
+                score += 10;
+            } else {
+                messageElement.textContent = "Wrong answer, try again.";
+                score -= 5;
+            }
+
+            inputElement.value = "";
+            scoreElement.textContent = "Score: " + score;
+
+            counter++;
+            if (counter < animals.length) {
+                displayAnimal(counter);
+            } else {
+                gameOver();
+            }
+        }
+
+        function gameOver() {
+            if (score > highScore) {
+                highScore = score;
+                highScoreElement.textContent = "High score: " + highScore;
+            }
+            document.querySelector(".playAgain").classList.remove("hidden");
+        }
+
+        document.querySelector(".play").addEventListener("click", play);
+        btnPlayAgain.addEventListener("click", reset);
+
+        // Allow pressing Enter to play
+        inputElement.addEventListener("keypress", function (e) {
+            if (e.key === "Enter") play();
+        });
+
+        // Restart game
+        reset();
+    </script>
+</body>
+
+</html>
